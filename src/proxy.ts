@@ -6,13 +6,16 @@ const ADMIN_PATHS = ["/admin"]
 
 // ── CSRF: 허용 Origin 목록 ──
 function getAllowedOrigins(): string[] {
-  const origins: string[] = []
+  const origins = new Set<string>()
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
-  if (siteUrl) origins.push(new URL(siteUrl).origin)
+  if (siteUrl) origins.add(new URL(siteUrl).origin)
   const vercelUrl = process.env.VERCEL_URL
-  if (vercelUrl) origins.push(`https://${vercelUrl}`)
-  origins.push("http://localhost:3000")
-  return origins
+  if (vercelUrl) origins.add(`https://${vercelUrl}`)
+  // Vercel 프리뷰/프로덕션 배포 자동 허용
+  const vercelProjectUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  if (vercelProjectUrl) origins.add(`https://${vercelProjectUrl}`)
+  origins.add("http://localhost:3000")
+  return [...origins]
 }
 
 function hasSupabaseSession(request: NextRequest): boolean {
