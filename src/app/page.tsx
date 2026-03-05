@@ -1,65 +1,467 @@
-import Image from "next/image";
+import Link from "next/link"
+import {
+  BarChart3,
+  Bot,
+  Briefcase,
+  CalendarDays,
+  Crown,
+  Flame,
+  Globe,
+  GraduationCap,
+  Landmark,
+  Leaf,
+  MessageSquareText,
+  Monitor,
+  MoreHorizontal,
+  Palette,
+  Sparkles,
+  Swords,
+  TrendingUp,
+  Trophy,
+  Users,
+  Zap,
+} from "lucide-react"
 
-export default function Home() {
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card"
+import { supabase } from "@/lib/supabase"
+import { NewThreadModal } from "@/components/new-thread-modal"
+import { DebateList } from "@/components/debate-list"
+import type { Debate } from "@/components/debate-list"
+import { HeaderAuth } from "@/components/header-auth"
+import { MissionCard } from "@/components/mission-card"
+import { LeaderBoard } from "@/components/leaderboard"
+import { SeasonBanner } from "@/components/season-banner"
+import { HotDebatesCarousel } from "@/components/hot-debates-carousel"
+import { LiveSessionsSidebar } from "@/components/live-sessions-sidebar"
+import type { LiveSession } from "@/components/live-sessions-sidebar"
+
+export const revalidate = 30
+
+type ThreadRow = Record<string, unknown>
+
+const PRESET_TAGS = [
+  "AI", "정치", "경제", "사회", "기술", "문화", "교육", "환경", "기타",
+]
+
+const TAG_ICON_MAP: Record<string, { icon: typeof Globe; colorClass: string }> = {
+  AI:   { icon: Bot,            colorClass: "text-cyan-400" },
+  정치: { icon: Landmark,       colorClass: "text-rose-400" },
+  경제: { icon: Briefcase,      colorClass: "text-emerald-400" },
+  사회: { icon: Users,          colorClass: "text-amber-400" },
+  기술: { icon: Monitor,        colorClass: "text-blue-400" },
+  문화: { icon: Palette,        colorClass: "text-purple-400" },
+  교육: { icon: GraduationCap,  colorClass: "text-teal-400" },
+  환경: { icon: Leaf,           colorClass: "text-green-400" },
+  기타: { icon: MoreHorizontal, colorClass: "text-zinc-400" },
+}
+
+function clampPct(n: number) {
+  if (!Number.isFinite(n)) return 50
+  return Math.max(0, Math.min(100, Math.round(n)))
+}
+
+function pickString(row: ThreadRow, keys: string[], fallback = "") {
+  for (const k of keys) {
+    const v = row[k]
+    if (typeof v === "string" && v.trim().length > 0) return v
+  }
+  return fallback
+}
+
+function pickNumber(row: ThreadRow, keys: string[], fallback = 0) {
+  for (const k of keys) {
+    const v = row[k]
+    if (typeof v === "number" && Number.isFinite(v)) return v
+    if (typeof v === "string") {
+      const parsed = Number(v)
+      if (Number.isFinite(parsed)) return parsed
+    }
+  }
+  return fallback
+}
+
+function pickBoolean(row: ThreadRow, keys: string[], fallback = false) {
+  for (const k of keys) {
+    const v = row[k]
+    if (typeof v === "boolean") return v
+    if (typeof v === "number") return v !== 0
+    if (typeof v === "string") {
+      const s = v.toLowerCase()
+      if (s === "true" || s === "1" || s === "yes") return true
+      if (s === "false" || s === "0" || s === "no") return false
+    }
+  }
+  return fallback
+}
+
+function formatEndsIn(row: ThreadRow) {
+  const direct = pickString(row, ["ends_in", "endsIn"], "")
+  if (direct) return direct
+
+  const raw = row["ends_at"] ?? row["endsAt"] ?? row["end_at"] ?? row["endAt"]
+  if (!raw) return "상시"
+
+  const end = raw instanceof Date ? raw : new Date(String(raw))
+  if (Number.isNaN(end.getTime())) return "상시"
+
+  const diffMs = end.getTime() - Date.now()
+  if (diffMs <= 0) return "마감"
+
+  const minutes = Math.floor(diffMs / 60000)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+
+  if (days >= 1) return `${days}일`
+  if (hours >= 1) return `${hours}시간`
+  return `${Math.max(1, minutes)}분`
+}
+
+function threadToDebate(row: ThreadRow): Debate | null {
+  const id = pickString(row, ["id", "thread_id", "threadId"], "")
+  if (!id) return null
+
+  const title = pickString(row, ["title", "subject", "name"], "제목 없는 토론")
+  const description = pickString(
+    row,
+    ["description", "summary", "content", "body"],
+    ""
+  )
+  const tag = pickString(row, ["tag", "category", "topic"], "토론")
+
+  const proCount = Math.max(0, pickNumber(row, ["pro_count", "proCount"], 0))
+  const conCount = Math.max(0, pickNumber(row, ["con_count", "conCount"], 0))
+  const total = proCount + conCount
+  const yesPct = total > 0 ? clampPct((proCount / total) * 100) : 50
+
+  const endsIn = formatEndsIn(row)
+  const hot =
+    pickBoolean(row, ["hot", "is_hot", "trending"], false) || total >= 10
+
+  const createdAt = String(
+    row["created_at"] ?? row["createdAt"] ?? new Date().toISOString()
+  )
+
+  const template = pickString(row, ["template"], "free")
+
+  const expiresAt = typeof row["expires_at"] === "string" ? row["expires_at"] as string : undefined
+  const isClosed = pickBoolean(row, ["is_closed"], false)
+  const aiVerdict = pickString(row, ["ai_verdict"], "") || null
+
+  return {
+    id,
+    title,
+    description,
+    tag,
+    yesPct,
+    proCount,
+    conCount,
+    endsIn,
+    hot,
+    createdAt,
+    template,
+    expiresAt,
+    isClosed,
+    aiVerdict,
+  }
+}
+
+async function fetchDebates(tag?: string): Promise<Debate[]> {
+  let query = supabase
+    .from("threads")
+    .select("id, title, content, tag, pro_count, con_count, created_at, is_closed, expires_at, template, ai_verdict, comments(count)")
+    .order("created_at", { ascending: false })
+    .limit(30)
+
+  if (tag) {
+    query = query.eq("tag", tag)
+  }
+
+  const { data, error } = await query
+
+  if (error) return []
+  const rows = (data ?? []) as (ThreadRow & { comments?: { count: number }[] })[]
+  return rows.reduce<Debate[]>((acc, row) => {
+    const debate = threadToDebate(row)
+    if (!debate) return acc
+    const commentAgg = row.comments
+    debate.commentCount = Array.isArray(commentAgg) && commentAgg.length > 0
+      ? commentAgg[0].count
+      : 0
+    acc.push(debate)
+    return acc
+  }, [])
+}
+
+/* 투표수 기준 상위 5개 — 캐러셀용 */
+async function fetchTopBattles(): Promise<Debate[]> {
+  const { data, error } = await supabase
+    .from("threads")
+    .select("id, title, content, tag, pro_count, con_count, created_at, is_closed, expires_at, template, ai_verdict")
+    .order("pro_count", { ascending: false })
+    .limit(20)
+
+  if (error || !data) return []
+  const rows = (data as ThreadRow[]).map(threadToDebate).filter((d): d is Debate => d !== null)
+  return rows
+    .sort((a, b) => (b.proCount + b.conCount) - (a.proCount + a.conCount))
+    .slice(0, 5)
+}
+
+/* 활성 라이브 세션 조회 */
+async function fetchLiveSessions(): Promise<LiveSession[]> {
+  const { data, error } = await supabase
+    .from("live_sessions")
+    .select("id, thread_id, duration_minutes, started_at, is_active, threads(title, tag)")
+    .eq("is_active", true)
+    .order("started_at", { ascending: false })
+    .limit(18)
+
+  if (error || !data) return []
+
+  return data.map((s: Record<string, unknown>) => {
+    const thread = s.threads as Record<string, unknown> | null
+    return {
+      id: String(s.id),
+      thread_id: String(s.thread_id),
+      thread_title: thread ? String(thread.title ?? "") : "",
+      thread_tag: thread ? (thread.tag as string | null) : null,
+      duration_minutes: Number(s.duration_minutes),
+      created_at: String(s.started_at),
+      is_active: true,
+    }
+  })
+}
+
+function formatCompact(n: number) {
+  return new Intl.NumberFormat("ko-KR", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(n)
+}
+
+function NeonStat({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: string
+}) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <Card className="border-white/10 bg-black/30 py-4 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_0_40px_rgba(34,211,238,0.08)]">
+      <CardContent className="px-4">
+        <div className="flex items-center gap-3">
+          <div className="grid size-9 place-items-center rounded-lg border border-white/10 bg-white/5 text-cyan-300">
+            {icon}
+          </div>
+          <div className="min-w-0">
+            <div className="text-xs text-zinc-400">{label}</div>
+            <div className="truncate text-sm font-semibold text-zinc-100">
+              {value}
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </CardContent>
+    </Card>
+  )
+}
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ tag?: string }>
+}) {
+  const params = await searchParams
+  const activeTag = params.tag ?? null
+
+  const [debates, topBattles, liveSessions] = await Promise.all([
+    fetchDebates(activeTag ?? undefined),
+    fetchTopBattles(),
+    fetchLiveSessions(),
+  ])
+
+  const totalVotes = debates.reduce(
+    (acc, d) => acc + d.proCount + d.conCount,
+    0
+  )
+  const hotCount = debates.filter((d) => d.hot).length
+
+  return (
+    <div className="min-h-screen bg-black text-zinc-100">
+      <div className="pointer-events-none fixed inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(1200px_circle_at_20%_10%,rgba(34,211,238,0.18),transparent_55%),radial-gradient(900px_circle_at_80%_20%,rgba(236,72,153,0.14),transparent_55%),radial-gradient(900px_circle_at_50%_90%,rgba(52,211,153,0.10),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.06),transparent_35%,rgba(255,255,255,0.04))] opacity-30" />
+      </div>
+
+      <div className="relative mx-auto w-full max-w-[1920px] px-4 py-10 sm:px-6 lg:px-10">
+        {/* 최상단 네비게이션 바 */}
+        <nav className="mb-6 flex items-center justify-between">
+          <span className="text-[11px] tracking-widest text-zinc-600">
+            NEON AGORA v1.0
+          </span>
+          <HeaderAuth />
+        </nav>
+
+        {/* ═══ 타이틀 바 ═══ */}
+        <div className="mb-5 flex flex-col justify-between gap-3 md:flex-row md:items-end">
+          <div className="flex items-center gap-4">
+            <div>
+              <div className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[10px] text-zinc-300">
+                <Sparkles className="size-3 text-cyan-300" />
+                CYBERPUNK DISCUSSION PLAZA
+              </div>
+              <h1 className="hero-title-glow text-2xl font-extrabold tracking-tight text-zinc-50 sm:text-4xl">
+                네온 아고라
+              </h1>
+            </div>
+            <NewThreadModal />
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 md:w-[440px]">
+            <NeonStat
+              icon={<TrendingUp className="size-4" />}
+              label="총 투표수"
+              value={formatCompact(totalVotes)}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <NeonStat
+              icon={<Users className="size-4" />}
+              label="토론 수"
+              value={formatCompact(debates.length)}
+            />
+            <NeonStat
+              icon={<Flame className="size-4" />}
+              label="핫 토론"
+              value={`${hotCount}개`}
+            />
+          </div>
         </div>
-      </main>
+
+        {/* ═══ 3컬럼 대시보드 레이아웃 ═══ */}
+        <main className="grid gap-5 lg:grid-cols-[220px_1fr_300px] xl:grid-cols-[240px_1fr_320px]">
+
+          {/* ── 좌측: 카테고리 + 라이브 세션 ── */}
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 space-y-4">
+              {/* 카테고리 */}
+              <div className="rounded-xl border border-white/[0.08] bg-black/30 p-3 backdrop-blur">
+                <div className="mb-2 text-[10px] font-semibold tracking-widest text-zinc-500">
+                  CATEGORIES
+                </div>
+                <nav className="space-y-0.5">
+                  <Link
+                    href="/"
+                    className={`flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] font-medium transition-all ${
+                      activeTag === null
+                        ? "bg-cyan-400/10 text-cyan-200 ring-1 ring-cyan-400/25"
+                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+                    }`}
+                  >
+                    <Globe className="size-3.5 text-cyan-400" />
+                    전체
+                  </Link>
+                  {PRESET_TAGS.map((tag) => {
+                    const tagMeta = TAG_ICON_MAP[tag]
+                    const IconComp = tagMeta?.icon ?? Zap
+                    const iconColor = tagMeta?.colorClass ?? "text-zinc-400"
+                    const isActive = activeTag === tag
+                    return (
+                      <Link
+                        key={tag}
+                        href={`/?tag=${tag}`}
+                        className={`flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] font-medium transition-all ${
+                          isActive
+                            ? "bg-fuchsia-400/10 text-fuchsia-200 ring-1 ring-fuchsia-400/25"
+                            : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+                        }`}
+                      >
+                        <IconComp className={`size-3.5 ${isActive ? "text-fuchsia-300" : iconColor}`} />
+                        {tag}
+                      </Link>
+                    )
+                  })}
+                </nav>
+              </div>
+
+              {/* 라이브 세션 */}
+              <LiveSessionsSidebar initialSessions={liveSessions} />
+
+              {/* 빠른 링크 */}
+              <div className="space-y-1">
+                <Link
+                  href="/arena"
+                  className="flex items-center gap-2 rounded-lg border border-red-400/20 bg-red-400/5 px-2.5 py-2 text-[11px] font-medium text-red-300 backdrop-blur transition hover:bg-red-400/10 hover:text-red-200"
+                >
+                  <Flame className="size-3.5 text-red-400" />
+                  열기장 모드
+                </Link>
+                <Link
+                  href="/stats"
+                  className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-black/30 px-2.5 py-2 text-[11px] font-medium text-zinc-400 backdrop-blur transition hover:bg-white/5 hover:text-zinc-200"
+                >
+                  <BarChart3 className="size-3.5 text-cyan-300" />
+                  통계 대시보드
+                </Link>
+                <Link
+                  href="/rankings"
+                  className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-black/30 px-2.5 py-2 text-[11px] font-medium text-zinc-400 backdrop-blur transition hover:bg-white/5 hover:text-zinc-200"
+                >
+                  <Trophy className="size-3.5 text-amber-300" />
+                  카테고리 랭킹
+                </Link>
+                <Link
+                  href="/tournaments"
+                  className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-black/30 px-2.5 py-2 text-[11px] font-medium text-zinc-400 backdrop-blur transition hover:bg-white/5 hover:text-zinc-200"
+                >
+                  <Swords className="size-3.5 text-cyan-300" />
+                  토론 토너먼트
+                </Link>
+                <Link
+                  href="/seasons"
+                  className="flex items-center gap-2 rounded-lg border border-yellow-400/20 bg-yellow-400/5 px-2.5 py-2 text-[11px] font-medium text-yellow-300 backdrop-blur transition hover:bg-yellow-400/10 hover:text-yellow-200"
+                >
+                  <Crown className="size-3.5 text-yellow-400" />
+                  시즌 랭킹
+                </Link>
+                <Link
+                  href="/weekly-report"
+                  className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-black/30 px-2.5 py-2 text-[11px] font-medium text-zinc-400 backdrop-blur transition hover:bg-white/5 hover:text-zinc-200"
+                >
+                  <CalendarDays className="size-3.5 text-emerald-300" />
+                  주간 리포트
+                </Link>
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-black/30 px-2.5 py-2 text-[11px] font-medium text-zinc-400 backdrop-blur transition hover:bg-white/5 hover:text-zinc-200"
+                >
+                  <MessageSquareText className="size-3.5 text-fuchsia-300" />
+                  내 프로필
+                </Link>
+              </div>
+            </div>
+          </aside>
+
+          {/* ── 중앙: 캐러셀 + 토론 그리드 ── */}
+          <div className="min-w-0 space-y-4">
+            <div className="mb-4">
+              <HotDebatesCarousel hotDebates={topBattles} />
+            </div>
+            <DebateList initialDebates={debates} initialTag={activeTag} />
+          </div>
+
+          {/* ── 우측: 미션 + 리더보드 ── */}
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 space-y-3">
+              <SeasonBanner />
+              <MissionCard />
+              <LeaderBoard />
+            </div>
+          </aside>
+        </main>
+      </div>
     </div>
-  );
+  )
 }

@@ -1,0 +1,17 @@
+{
+  "name": "네온 아고라",
+  "short_name": "네온 아고라",
+  "description": "사이버펑크 테마의 실시간 찬반 토론 플랫폼",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(npx next:*)",
+      "Bash(ls:*)",
+      "WebSearch",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(rm:*)",
+      "Bash(grep:*)",
+      "Bash(test:*)",
+      "Bash(wc:*)",
+      "Bash(npm ls:*)",
+      "Bash(tr -d '\\(')",
+      "Bash(find:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npm start:*)",
+      "Bash(curl:*)",
+      "Bash(node:*)",
+      "Bash(taskkill:*)",
+      "WebFetch(domain:ai.google.dev)",
+      "Bash(tasklist:*)",
+      "Bash(netstat:*)",
+      "Bash(xargs:*)",
+      "Bash(\"C:\\\\Users\\\\82108\\\\Desktop\\\\deabte-app\\\\.env.example\":*)"
+    ]
+  }
+}
