@@ -291,24 +291,27 @@ export default async function ThreadDetailPage({
   return (
     <div className="flex h-full flex-col overflow-hidden text-zinc-100" style={{ background: "#0a0f14" }}>
       {/* ═══ Header ═══ */}
-      <div className="shrink-0 px-4 pt-3 pb-2 relative md:px-6" style={{ background: "#0a0f14" }}>
-        <Link href="/" className="absolute left-4 top-2.5 inline-flex items-center justify-center w-9 h-9 rounded-[10px] bg-white/[0.03] border border-white/[0.06] text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.06] transition md:left-6">
-          <ArrowLeft className="size-4" />
-        </Link>
-        <div className="text-center max-w-xl mx-auto">
-          <h1 className="font-orbitron text-lg font-black tracking-wide text-zinc-100 md:text-xl">{title}</h1>
-          {content && <p className="mt-1 text-[12px] text-zinc-500 line-clamp-2 leading-relaxed">{content}</p>}
-          <div className="mt-1 flex items-center justify-center gap-2">
-            {tag && <span className="text-[10px] font-bold tracking-wider text-zinc-600">#{tag}</span>}
-            {threadUpdatedAt && <span className="text-[9px] text-zinc-700">(수정됨)</span>}
+      <div className="shrink-0 px-4 pb-2 pt-3 md:px-6" style={{ background: "#0a0f14", position: "relative", zIndex: 10 }}>
+        {/* 1줄: 뒤로 + 제목 + 액션 */}
+        <div className="mb-2 flex items-start gap-2">
+          <Link href="/" className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-[10px] border border-white/[0.06] bg-white/[0.03] text-zinc-500 transition hover:bg-white/[0.06] hover:text-zinc-200">
+            <ArrowLeft className="size-4" />
+          </Link>
+          <div className="min-w-0 flex-1">
+            <h1 className="line-clamp-2 text-base font-black leading-snug tracking-wide text-zinc-100 md:text-xl">{title}</h1>
+            {content && <p className="mt-1 line-clamp-1 text-[12px] leading-relaxed text-zinc-500">{content}</p>}
+            <div className="mt-1 flex items-center gap-2">
+              {tag && <span className="text-[10px] font-bold tracking-wider text-zinc-600">#{tag}</span>}
+              {threadUpdatedAt && <span className="text-[9px] text-zinc-700">(수정됨)</span>}
+              <CountdownWrapper expiresAt={expiresAt} isClosed={isClosed} threadId={id} />
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
+            <ThreadEditButton threadId={id} threadCreatedBy={createdBy} initialTitle={title} initialContent={content} initialTag={tag} isClosed={isClosed} />
+            <MuteButton threadId={id} />
+            <ShareButton title={title} threadId={id} />
           </div>
         </div>
-        <div className="absolute right-4 top-3 flex items-center gap-1 md:right-6">
-          <ThreadEditButton threadId={id} threadCreatedBy={createdBy} initialTitle={title} initialContent={content} initialTag={tag} isClosed={isClosed} />
-          <MuteButton threadId={id} />
-          <ShareButton title={title} threadId={id} />
-        </div>
-        <CountdownWrapper expiresAt={expiresAt} isClosed={isClosed} threadId={id} />
       </div>
 
       {/* ═══ Card Grid ═══ */}

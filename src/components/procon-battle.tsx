@@ -371,44 +371,42 @@ export function ProConBattle({
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#0a0a0f", color: "#eee" }}>
       {/* ═══ HEADER ═══ */}
-      <header style={{
-        padding: "12px 20px",
+      <header className="px-3 py-2.5 md:px-5 md:py-3" style={{
         background: "rgba(10,10,15,0.9)", backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         borderBottom: "1px solid rgba(255,255,255,0.03)",
         flexShrink: 0,
       }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0, flex: 1 }}>
-            <Link href="/" style={{
-              width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-              display: "inline-flex", alignItems: "center", justifyContent: "center",
-              color: "#666", fontSize: 18, background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.06)",
-            }} className="hover:text-zinc-200 hover:bg-white/[0.06] transition">
-              {"\u2190"}
-            </Link>
-            <h1 style={{ fontSize: 16, fontWeight: 800, color: "#eee", letterSpacing: -0.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {title}
-            </h1>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-            {countdown}
-            <span style={{ fontSize: 11, color: "#555", display: "flex", alignItems: "center", gap: 4 }}>
-              {participantCount}명 참여
-            </span>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => setToolsOpen(true)}
-              className="border-emerald-400/25 bg-emerald-400/8 text-emerald-300 hover:bg-emerald-400/15"
-            >
-              <Settings2 className="size-3.5" />
-              도구
-            </Button>
+        {/* 1줄: ← 뒤로 + 제목 + 액션 */}
+        <div className="mb-2 flex items-center gap-2">
+          <Link href="/" className="inline-flex size-8 shrink-0 items-center justify-center rounded-[10px] border border-white/[0.06] bg-white/[0.03] text-zinc-500 transition hover:bg-white/[0.06] hover:text-zinc-200 md:size-9" style={{ fontSize: 18 }}>
+            {"\u2190"}
+          </Link>
+          <h1 className="min-w-0 flex-1 truncate text-[15px] font-extrabold tracking-tight text-zinc-100 md:text-base" style={{ letterSpacing: -0.3 }}>
+            {title}
+          </h1>
+          <div className="flex shrink-0 items-center gap-1">
             {headerActions}
           </div>
+        </div>
+
+        {/* 2줄: 카운트다운 + 참여 + 도구 */}
+        <div className="mb-2 flex items-center gap-2">
+          {countdown}
+          <span className="whitespace-nowrap text-[11px] text-zinc-600">
+            {participantCount}명 참여
+          </span>
+          <div className="flex-1" />
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => setToolsOpen(true)}
+            className="border-emerald-400/25 bg-emerald-400/8 text-emerald-300 hover:bg-emerald-400/15"
+          >
+            <Settings2 className="size-3.5" />
+            <span className="hidden sm:inline">도구</span>
+          </Button>
         </div>
 
         {/* Ratio bar — integrated in header */}
@@ -434,7 +432,7 @@ export function ProConBattle({
       {/* ═══ CHAT FEED ═══ */}
       <div
         ref={feedRef}
-        className="p-4 md:px-6"
+        className="p-4 pb-24 md:px-6 md:pb-4"
         style={{
           flex: 1, overflowY: "auto",
         }}

@@ -187,52 +187,52 @@ export function BattleComments({
   return (
     <section className="flex h-full flex-col" style={{ background: "#0a0f14" }}>
       {/* ═══ Sticky Header ═══ */}
-      <header style={{
+      <header className="px-4 py-2.5 md:px-6" style={{
         position: "sticky", top: 0, zIndex: 20, flexShrink: 0,
         background: "rgba(10,15,20,0.92)", backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         borderBottom: "1px solid rgba(255,255,255,0.03)",
-        padding: "12px 24px",
       }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-            <p style={{ fontSize: 11, color: "#444", marginTop: 0, whiteSpace: "nowrap" }}>
-              자유토론 · {sortedComments.length}개 의견 · {totalReplies}개 댓글
+        {/* 1줄: 정보 + 의견쓰기 */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <p className="whitespace-nowrap text-[11px] text-zinc-600">
+              자유토론 · {sortedComments.length}개 의견
             </p>
+            {totalReactions > 0 && (
+              <span className="whitespace-nowrap text-[11px] text-zinc-600">
+                · {totalReactions} 반응
+              </span>
+            )}
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
             {/* 정렬 토글 */}
             <div className="flex items-center gap-0.5 rounded-lg border border-white/[0.06] bg-white/[0.02] p-0.5">
               <button
                 type="button"
                 onClick={() => setFreeSortBy("hot")}
-                className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-semibold transition-all ${
+                className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-[10px] font-semibold transition-all ${
                   freeSortBy === "hot"
                     ? "bg-amber-500/15 text-amber-300 shadow-sm"
                     : "text-zinc-500 hover:text-zinc-300"
                 }`}
               >
                 <ThumbsUp className="size-2.5" />
-                좋아요순
+                좋아요
               </button>
               <button
                 type="button"
                 onClick={() => setFreeSortBy("latest")}
-                className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-semibold transition-all ${
+                className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-[10px] font-semibold transition-all ${
                   freeSortBy === "latest"
                     ? "bg-cyan-500/15 text-cyan-300 shadow-sm"
                     : "text-zinc-500 hover:text-zinc-300"
                 }`}
               >
                 <Clock className="size-2.5" />
-                최신순
+                최신
               </button>
             </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-            {totalReactions > 0 && (
-              <span style={{ fontSize: 11, color: "#444" }}>
-                {totalReactions} 반응
-              </span>
-            )}
             {!isClosed && (
               <button
                 type="button"
@@ -266,7 +266,7 @@ export function BattleComments({
         <div className={`flex flex-col min-h-0 transition-all duration-300 ease-out ${
           isPanelOpen ? "w-0 md:w-[55%] hidden md:flex" : "w-full"
         }`}>
-          <div className="flex-1 overflow-y-auto side-panel-scroll" style={{ padding: "20px 24px 100px" }}>
+          <div className="flex-1 overflow-y-auto side-panel-scroll px-4 pb-24 pt-4 md:px-6 md:pb-24 md:pt-5">
             {sortedComments.length === 0 ? (
               <div style={{
                 display: "flex", flexDirection: "column", alignItems: "center",

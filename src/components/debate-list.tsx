@@ -5,6 +5,7 @@ import {
   BellRing,
   Bookmark,
   BookmarkCheck,
+  ChevronDown,
   Clock,
   Flame,
   Globe,
@@ -590,6 +591,7 @@ export function DebateList({ initialDebates, initialTag }: { initialDebates: Deb
 
   // ── 상태 필터 ──
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
+  const [statusOpen, setStatusOpen] = useState(false)
   const [myThreadIds, setMyThreadIds] = useState<Set<string> | null>(null)
   const [myThreadIdsLoading, setMyThreadIdsLoading] = useState(false)
 
@@ -1229,7 +1231,7 @@ export function DebateList({ initialDebates, initialTag }: { initialDebates: Deb
         </div>
 
         {/* 새 토론 + 검색 입력 */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <NewThreadModal />
           <div className={`flex flex-1 items-center gap-2 rounded-xl border px-3 py-2.5 backdrop-blur transition-all ${
             searchQuery
@@ -1243,7 +1245,7 @@ export function DebateList({ initialDebates, initialTag }: { initialDebates: Deb
             )}
             <input
               className="w-full min-w-0 bg-transparent text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none"
-              placeholder={searchLoading ? "검색 중…" : "토론 검색…"}
+              placeholder={searchLoading ? "서버에서 검색 중…" : "토론 검색: 제목, 내용, 태그…"}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               aria-label="토론 검색"
@@ -1285,44 +1287,58 @@ export function DebateList({ initialDebates, initialTag }: { initialDebates: Deb
         )}
       </div>
 
-      {/* 상태 필터 칩 */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-semibold tracking-widest text-zinc-600">STATUS</span>
-        {([
-          { key: "all" as StatusFilter, label: "전체", color: "cyan" },
-          { key: "live" as StatusFilter, label: "진행 중", color: "green" },
-          { key: "settled" as StatusFilter, label: "마감", color: "violet" },
-          { key: "my" as StatusFilter, label: "내가 참여한", color: "amber" },
-        ] as const).map(({ key, label, color }) => {
-          const active = statusFilter === key
-          const colorMap: Record<string, { active: string; inactive: string }> = {
-            cyan:   { active: "border-cyan-400/50 bg-cyan-400/15 text-cyan-100 shadow-[0_0_10px_rgba(34,211,238,0.2)]",   inactive: "border-white/10 bg-white/5 text-zinc-400 hover:border-white/20 hover:text-zinc-200" },
-            green:  { active: "border-green-400/50 bg-green-400/15 text-green-100 shadow-[0_0_10px_rgba(74,222,128,0.2)]", inactive: "border-white/10 bg-white/5 text-zinc-400 hover:border-white/20 hover:text-zinc-200" },
-            violet: { active: "border-violet-400/50 bg-violet-400/15 text-violet-100 shadow-[0_0_10px_rgba(139,92,246,0.2)]", inactive: "border-white/10 bg-white/5 text-zinc-400 hover:border-white/20 hover:text-zinc-200" },
-            amber:  { active: "border-amber-400/50 bg-amber-400/15 text-amber-100 shadow-[0_0_10px_rgba(245,158,11,0.2)]", inactive: "border-white/10 bg-white/5 text-zinc-400 hover:border-white/20 hover:text-zinc-200" },
-          }
-          return (
-            <button
-              key={key}
-              type="button"
-              onClick={() => {
-                if (key === "my" && !user) {
-                  showToast("로그인이 필요한 기능입니다.", "info")
-                  return
-                }
-                setStatusFilter(key)
-              }}
-              className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                active ? colorMap[color].active : colorMap[color].inactive
-              }`}
-            >
-              {label}
-              {key === "my" && myThreadIdsLoading && (
-                <Loader2 className="ml-1 inline size-3 animate-spin" />
-              )}
-            </button>
-          )
-        })}
+      {/* 상태 필터 — 드롭다운 */}
+      <div className="relative inline-block">
+        <button
+          type="button"
+          onClick={() => setStatusOpen(prev => !prev)}
+          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+            statusFilter === "all"
+              ? "border-white/10 bg-white/5 text-zinc-400"
+              : statusFilter === "live"
+                ? "border-green-400/50 bg-green-400/15 text-green-100 shadow-[0_0_10px_rgba(74,222,128,0.2)]"
+                : statusFilter === "settled"
+                  ? "border-violet-400/50 bg-violet-400/15 text-violet-100 shadow-[0_0_10px_rgba(139,92,246,0.2)]"
+                  : "border-amber-400/50 bg-amber-400/15 text-amber-100 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
+          }`}
+        >
+          <span className="text-[10px] font-semibold tracking-widest text-zinc-500">STATUS</span>
+          <span>{statusFilter === "all" ? "전체" : statusFilter === "live" ? "진행 중" : statusFilter === "settled" ? "마감" : "내가 참여한"}</span>
+          {myThreadIdsLoading && statusFilter === "my" && <Loader2 className="size-3 animate-spin" />}
+          <ChevronDown className={`size-3 transition-transform ${statusOpen ? "rotate-180" : ""}`} />
+        </button>
+        {statusOpen && (
+          <>
+            <div className="fixed inset-0 z-30" onClick={() => setStatusOpen(false)} />
+            <div className="absolute left-0 top-full z-40 mt-1 w-40 overflow-hidden rounded-xl border border-white/10 bg-zinc-900/95 py-1 shadow-xl backdrop-blur">
+              {([
+                { key: "all" as StatusFilter, label: "전체" },
+                { key: "live" as StatusFilter, label: "진행 중" },
+                { key: "settled" as StatusFilter, label: "마감" },
+                { key: "my" as StatusFilter, label: "내가 참여한" },
+              ] as const).map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    if (key === "my" && !user) {
+                      showToast("로그인이 필요한 기능입니다.", "info")
+                      return
+                    }
+                    setStatusFilter(key)
+                    setStatusOpen(false)
+                  }}
+                  className={`flex w-full items-center gap-2 px-3 py-2 text-left text-xs transition ${
+                    statusFilter === key ? "bg-white/[0.06] font-semibold text-zinc-100" : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
+                  }`}
+                >
+                  {statusFilter === key && <span className="text-cyan-400">●</span>}
+                  {label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* 카테고리 필터 — 수평 탭 */}
