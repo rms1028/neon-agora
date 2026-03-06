@@ -90,13 +90,13 @@ export function HotDebatesCarousel({
 
       {/* 슬라이드 — 히어로 */}
       <div className="relative min-h-[200px] sm:min-h-[220px]">
-        {/* 좌우 화살표 */}
+        {/* 좌우 화살표 — 모바일에서 하단 배치 */}
         {count > 1 && (
           <>
             <button
               type="button"
               onClick={() => paginate(-1)}
-              className="absolute left-2 top-1/2 z-20 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/60 text-zinc-400 backdrop-blur transition hover:border-cyan-400/40 hover:bg-black/80 hover:text-cyan-300 sm:left-3 sm:size-10"
+              className="absolute left-2 z-20 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/60 text-zinc-400 backdrop-blur transition hover:border-cyan-400/40 hover:bg-black/80 hover:text-cyan-300 sm:left-3 sm:top-1/2 sm:grid"
               aria-label="이전 배틀"
             >
               <ChevronLeft className="size-5" />
@@ -104,7 +104,7 @@ export function HotDebatesCarousel({
             <button
               type="button"
               onClick={() => paginate(1)}
-              className="absolute right-2 top-1/2 z-20 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/60 text-zinc-400 backdrop-blur transition hover:border-cyan-400/40 hover:bg-black/80 hover:text-cyan-300 sm:right-3 sm:size-10"
+              className="absolute right-2 z-20 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/60 text-zinc-400 backdrop-blur transition hover:border-cyan-400/40 hover:bg-black/80 hover:text-cyan-300 sm:right-3 sm:top-1/2 sm:grid"
               aria-label="다음 배틀"
             >
               <ChevronRight className="size-5" />
@@ -121,30 +121,30 @@ export function HotDebatesCarousel({
             animate="center"
             exit="exit"
             transition={{ duration: 0.25 }}
-            className="absolute inset-0 flex flex-col justify-center gap-4 px-14 py-6 sm:flex-row sm:items-center sm:gap-8 sm:px-16"
+            className="absolute inset-0 flex flex-col justify-center gap-3 px-4 py-5 sm:flex-row sm:items-center sm:gap-8 sm:px-16"
           >
             {/* 좌: 라벨 + 제목 + 게이지 */}
-            <div className="min-w-0 flex-1 space-y-4">
-              <div className="flex items-center gap-2.5">
-                <span className="inline-flex items-center gap-1.5 rounded-md border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-1 text-[10px] font-bold tracking-[0.15em] text-cyan-300">
+            <div className="min-w-0 flex-1 space-y-3 sm:space-y-4">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5">
+                <span className="inline-flex items-center gap-1 rounded-md border border-cyan-400/30 bg-cyan-400/10 px-2 py-0.5 text-[9px] font-bold tracking-[0.15em] text-cyan-300 sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-[10px]">
                   <Swords className="size-3" />
                   MAIN AGORA
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full border border-orange-400/30 bg-orange-500/15 px-2 py-0.5 text-[10px] font-bold text-orange-300 shadow-[0_0_8px_rgba(251,146,60,0.15)]">
+                <span className="inline-flex items-center gap-1 rounded-full border border-orange-400/30 bg-orange-500/15 px-1.5 py-0.5 text-[9px] font-bold text-orange-300 sm:px-2 sm:text-[10px]">
                   <Flame className="size-2.5" />
                   HOT
                 </span>
-                <span className="text-[11px] tabular-nums text-zinc-500">
+                <span className="text-[10px] tabular-nums text-zinc-500 sm:text-[11px]">
                   {activeIndex + 1}/{count}
                 </span>
                 {debate.tag && (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-zinc-400">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-1.5 py-0.5 text-[9px] text-zinc-400 sm:px-2 sm:text-[10px]">
                     <Zap className="size-2.5 text-cyan-300" />
                     {debate.tag}
                   </span>
                 )}
               </div>
-              <h2 className="line-clamp-2 text-xl font-extrabold leading-tight text-white sm:text-2xl lg:text-3xl">
+              <h2 className="line-clamp-2 text-base font-extrabold leading-tight text-white sm:text-2xl lg:text-3xl">
                 {debate.title}
               </h2>
               {/* 굵은 게이지 */}
@@ -197,9 +197,18 @@ export function HotDebatesCarousel({
         </AnimatePresence>
       </div>
 
-      {/* 인디케이터 */}
+      {/* 인디케이터 + 모바일 화살표 */}
       {count > 1 && (
-        <div className="relative z-10 flex items-center gap-1.5 px-5 pb-3 sm:px-8">
+        <div className="relative z-10 flex items-center gap-1.5 px-4 pb-3 sm:px-8">
+          {/* 모바일 좌 화살표 */}
+          <button
+            type="button"
+            onClick={() => paginate(-1)}
+            className="grid size-7 shrink-0 place-items-center rounded-full border border-white/10 bg-black/40 text-zinc-400 sm:hidden"
+            aria-label="이전"
+          >
+            <ChevronLeft className="size-4" />
+          </button>
           {hotDebates.map((_, i) => {
             const isActive = i === activeIndex
             const isPast = i < activeIndex
@@ -223,6 +232,15 @@ export function HotDebatesCarousel({
               </button>
             )
           })}
+          {/* 모바일 우 화살표 */}
+          <button
+            type="button"
+            onClick={() => paginate(1)}
+            className="grid size-7 shrink-0 place-items-center rounded-full border border-white/10 bg-black/40 text-zinc-400 sm:hidden"
+            aria-label="다음"
+          >
+            <ChevronRight className="size-4" />
+          </button>
         </div>
       )}
     </div>

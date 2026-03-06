@@ -285,17 +285,17 @@ export default async function Home({
           <div className="grid grid-cols-3 gap-2 md:w-[440px]">
             <NeonStat
               icon={<TrendingUp className="size-4" />}
-              label="총 투표수"
+              label="투표"
               value={formatCompact(totalVotes)}
             />
             <NeonStat
               icon={<Users className="size-4" />}
-              label="토론 수"
+              label="토론"
               value={formatCompact(debates.length)}
             />
             <NeonStat
               icon={<Flame className="size-4" />}
-              label="핫 토론"
+              label="핫"
               value={`${hotCount}개`}
             />
           </div>

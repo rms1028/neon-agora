@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Bell, Home, Shield, Swords, Trophy, User } from "lucide-react"
+import { Bell, Home, Shield, Sparkles, Trophy, User } from "lucide-react"
 
 import { useNotifications } from "@/components/notification-provider"
 import { useAuth } from "@/components/auth-provider"
@@ -19,7 +19,7 @@ type Tab = {
 
 const TABS: Tab[] = [
   { href: "/", icon: Home, label: "홈" },
-  { href: "/arena", icon: Swords, label: "아레나" },
+  { href: "/seasons", icon: Sparkles, label: "시즌" },
   { href: "/rankings", icon: Trophy, label: "랭킹" },
   { href: "/notifications", icon: Bell, label: "알림", badge: true },
   { href: "/profile", icon: User, label: "프로필" },

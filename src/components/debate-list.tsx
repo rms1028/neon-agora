@@ -1170,9 +1170,9 @@ export function DebateList({ initialDebates, initialTag }: { initialDebates: Deb
     <section className="space-y-4">
       {/* 헤더: 검색 + 정렬 */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <h2 className="text-sm font-semibold tracking-wide text-zinc-200">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex shrink-0 items-center gap-2.5">
+            <h2 className="whitespace-nowrap text-sm font-semibold tracking-wide text-zinc-200">
               라이브 토론
             </h2>
             <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-zinc-500">
@@ -1180,10 +1180,10 @@ export function DebateList({ initialDebates, initialTag }: { initialDebates: Deb
             </span>
           </div>
 
-          <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-black/40 p-1 backdrop-blur">
+          <div className="flex items-center gap-1 overflow-x-auto rounded-xl border border-white/10 bg-black/40 p-1 backdrop-blur scrollbar-hide">
             <button
               onClick={() => setSortBy("hot")}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                 sortBy === "hot"
                   ? "bg-orange-500/20 text-orange-200 shadow-[0_0_14px_rgba(249,115,22,0.25)] ring-1 ring-orange-400/40"
                   : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
@@ -1194,7 +1194,7 @@ export function DebateList({ initialDebates, initialTag }: { initialDebates: Deb
             </button>
             <button
               onClick={() => setSortBy("latest")}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                 sortBy === "latest"
                   ? "bg-cyan-500/20 text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.20)] ring-1 ring-cyan-400/40"
                   : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
@@ -1205,7 +1205,7 @@ export function DebateList({ initialDebates, initialTag }: { initialDebates: Deb
             </button>
             <button
               onClick={() => setSortBy("popular")}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                 sortBy === "popular"
                   ? "bg-fuchsia-500/20 text-fuchsia-200 shadow-[0_0_14px_rgba(236,72,153,0.20)] ring-1 ring-fuchsia-400/40"
                   : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
@@ -1216,7 +1216,7 @@ export function DebateList({ initialDebates, initialTag }: { initialDebates: Deb
             </button>
             <button
               onClick={() => setSortBy("ending")}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                 sortBy === "ending"
                   ? "bg-amber-500/20 text-amber-200 shadow-[0_0_14px_rgba(245,158,11,0.20)] ring-1 ring-amber-400/40"
                   : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"

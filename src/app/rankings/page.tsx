@@ -156,12 +156,12 @@ export default async function RankingsPage({
         </div>
 
         {/* 탭 */}
-        <div className="mb-6 flex flex-wrap items-center gap-2">
+        <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
           {TABS.map((t) => (
             <Link
               key={t}
               href={`/rankings${t === "전체" ? "" : `?tab=${encodeURIComponent(t)}`}`}
-              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+              className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                 activeTab === t
                   ? "border-amber-400/50 bg-amber-400/15 text-amber-100 shadow-[0_0_12px_rgba(234,179,8,0.2)]"
                   : "border-white/10 bg-white/5 text-zinc-400 hover:border-white/20 hover:text-zinc-200"

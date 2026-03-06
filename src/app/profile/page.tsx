@@ -303,17 +303,17 @@ export default function ProfilePage() {
       {/* Header */}
       <header className="px-4 md:px-10" style={{ paddingTop: 16, paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.03)", background: "rgba(10,10,15,0.8)", backdropFilter: "blur(20px)", position: "sticky", top: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Link href="/" style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.06)", color: "#666", fontSize: 13, padding: "6px 16px", borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <ArrowLeft style={{ width: 14, height: 14 }} /> 홈
+          <Link href="/" className="shrink-0" style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.06)", color: "#666", fontSize: 13, padding: "6px 12px", borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4, whiteSpace: "nowrap" }}>
+            <ArrowLeft style={{ width: 14, height: 14 }} /> <span className="hidden sm:inline">홈</span>
           </Link>
-          <span style={{ fontSize: 15, fontWeight: 700, color: "#888" }}>MY PROFILE</span>
+          <span className="whitespace-nowrap text-sm font-bold text-zinc-500 md:text-[15px]">MY PROFILE</span>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <Link href="/settings/notifications" style={{ padding: "7px 18px", borderRadius: 8, fontSize: 12, fontWeight: 600, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)", color: "#999", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}>
+        <div className="flex shrink-0 gap-1.5 sm:gap-2">
+          <Link href="/settings/notifications" className="hidden sm:inline-flex" style={{ padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)", color: "#999", textDecoration: "none", alignItems: "center", gap: 4, whiteSpace: "nowrap" }}>
             <Settings style={{ width: 12, height: 12 }} /> 설정
           </Link>
-          <Link href="/settings/profile" style={{ padding: "7px 18px", borderRadius: 8, fontSize: 12, fontWeight: 600, border: "1px solid rgba(0,228,165,0.2)", background: "rgba(0,228,165,0.06)", color: "#00e4a5", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}>
-            <Pencil style={{ width: 12, height: 12 }} /> 프로필 수정
+          <Link href="/settings/profile" style={{ padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, border: "1px solid rgba(0,228,165,0.2)", background: "rgba(0,228,165,0.06)", color: "#00e4a5", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4, whiteSpace: "nowrap" }}>
+            <Pencil style={{ width: 12, height: 12 }} /> 수정
           </Link>
         </div>
       </header>
@@ -327,29 +327,30 @@ export default function ProfilePage() {
           <div className="profile-fadeUp" style={{ borderRadius: 20, background: "linear-gradient(135deg, rgba(0,228,165,0.03) 0%, rgba(192,132,252,0.02) 100%)", border: "1px solid rgba(0,228,165,0.08)", marginBottom: 24, position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, background: "radial-gradient(circle at top right, rgba(192,132,252,0.06), transparent 70%)" }} />
 
-            <div style={{ padding: "32px 32px 0" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+            <div className="px-5 pt-6 sm:px-8 sm:pt-8">
+              {/* 모바일: 세로 중앙 / 데스크탑: 가로 */}
+              <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:gap-5 sm:text-left">
                 {/* Avatar */}
-                <div className="profile-avatar-glow" style={{ width: 72, height: 72, borderRadius: 20, background: "linear-gradient(135deg, rgba(0,228,165,0.15), rgba(0,200,255,0.1))", border: "2px solid rgba(0,228,165,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "#00e4a5", position: "relative" }}>
+                <div className="profile-avatar-glow" style={{ width: 72, height: 72, borderRadius: 20, background: "linear-gradient(135deg, rgba(0,228,165,0.15), rgba(0,200,255,0.1))", border: "2px solid rgba(0,228,165,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 900, color: "#00e4a5", position: "relative", flexShrink: 0 }}>
                   {avatarInitial}
                   <div style={{ position: "absolute", bottom: -2, right: -2, width: 14, height: 14, borderRadius: "50%", background: "#00e4a5", border: "3px solid #0a0a0f" }} />
                 </div>
 
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                    <span style={{ fontSize: 22, fontWeight: 900, color: "#eee" }}>{displayName}</span>
-                    <span style={{ fontSize: 11, fontWeight: 800, color: "#c084fc", background: "rgba(192,132,252,0.12)", padding: "3px 10px", borderRadius: 8, border: "1px solid rgba(192,132,252,0.2)", fontFamily: "'JetBrains Mono', monospace" }}>Lv.{level}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                    <span className="text-xl font-black text-zinc-100 sm:text-[22px]">{displayName}</span>
+                    <span className="whitespace-nowrap rounded-lg border border-purple-400/20 bg-purple-400/10 px-2.5 py-0.5 text-[11px] font-extrabold text-purple-300" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Lv.{level}</span>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 12, color: currentBadge.color, fontWeight: 600 }}>{currentBadge.icon} {currentBadge.name}</span>
-                    {activity.joinDate && <span style={{ fontSize: 11, color: "#444" }}>· {formatDate(activity.joinDate)} 가입</span>}
+                  <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                    <span className="whitespace-nowrap text-xs font-semibold" style={{ color: currentBadge.color }}>{currentBadge.icon} {currentBadge.name}</span>
+                    {activity.joinDate && <span className="whitespace-nowrap text-[11px] text-zinc-600">· {formatDate(activity.joinDate)} 가입</span>}
                   </div>
                 </div>
 
                 {/* XP */}
-                <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: "#ffd055", fontFamily: "'JetBrains Mono', monospace", display: "flex", alignItems: "center", gap: 4, justifyContent: "flex-end" }}>⚡ {xp} XP</div>
-                  {nextBadge && <div style={{ fontSize: 10, color: "#555", marginTop: 2 }}>다음: {nextBadge.name}</div>}
+                <div className="mt-1 sm:mt-0 sm:text-right">
+                  <div className="flex items-center justify-center gap-1 text-sm font-extrabold text-amber-300 sm:justify-end" style={{ fontFamily: "'JetBrains Mono', monospace" }}>⚡ {xp} XP</div>
+                  {nextBadge && <div className="mt-0.5 whitespace-nowrap text-[10px] text-zinc-600">다음: {nextBadge.name}</div>}
                 </div>
               </div>
             </div>
