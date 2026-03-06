@@ -272,7 +272,7 @@ export default async function ThreadDetailPage({
 
     return (
       <ProConBattle
-        threadId={id} title={title} tag={tag} isClosed={isClosed}
+        threadId={id} title={title} description={content} tag={tag} isClosed={isClosed}
         threadCreatedBy={createdBy} template={template}
         proPercent={yesPct} conPercent={noPct} totalVotes={totalVotes}
         proCount={proCount} conCount={conCount}
@@ -314,6 +314,11 @@ export default async function ThreadDetailPage({
         <h1 style={{ fontSize: 18, fontWeight: 800, color: "#eee", wordBreak: "keep-all", overflowWrap: "break-word", lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {title}
         </h1>
+        {content && (
+          <p style={{ fontSize: 13, color: "#888", lineHeight: 1.6, marginTop: 6, wordBreak: "keep-all", overflowWrap: "break-word", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+            {content}
+          </p>
+        )}
       </div>
 
       {/* ═══ Card Grid ═══ */}

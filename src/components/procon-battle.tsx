@@ -23,13 +23,13 @@ const CON = "#ff4d8d"
    ProConBattle — 채팅 스타일 찬반토론
    ════════════════════════════════════════════════════════ */
 export function ProConBattle({
-  threadId, title, tag, isClosed, threadCreatedBy, template,
+  threadId, title, description, tag, isClosed, threadCreatedBy, template,
   proPercent, conPercent, totalVotes, proCount: initProCount, conCount: initConCount,
   expiresAt, threadUpdatedAt,
   comments, hasMoreComments, nextCursor,
   headerActions, countdown, toolsBlock,
 }: {
-  threadId: string; title: string; tag: string
+  threadId: string; title: string; description?: string; tag: string
   isClosed: boolean; threadCreatedBy: string; template: string
   proPercent: number; conPercent: number; totalVotes: number
   proCount: number; conCount: number
@@ -415,6 +415,11 @@ export function ProConBattle({
         <h1 style={{ fontSize: 18, fontWeight: 800, color: "#eee", wordBreak: "keep-all", overflowWrap: "break-word", lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {title}
         </h1>
+        {description && (
+          <p style={{ fontSize: 13, color: "#888", lineHeight: 1.6, marginTop: 6, wordBreak: "keep-all", overflowWrap: "break-word", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+            {description}
+          </p>
+        )}
       </div>
 
       {/* ═══ CLOSED BANNER ═══ */}
