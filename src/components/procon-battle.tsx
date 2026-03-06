@@ -8,6 +8,7 @@ import { CommentComposer } from "@/components/comment-composer"
 import { MarkdownContent } from "@/components/markdown-content"
 import { UserTitleBadge } from "@/components/user-title-badge"
 import { ReportModal } from "@/components/report-modal"
+import { ExpandableDescription } from "@/components/expandable-description"
 import { useCommentState } from "@/hooks/useCommentState"
 import { useCommentPagination } from "@/hooks/useCommentPagination"
 import { timeAgo } from "@/lib/utils"
@@ -415,11 +416,7 @@ export function ProConBattle({
         <h1 style={{ fontSize: 18, fontWeight: 800, color: "#eee", wordBreak: "keep-all", overflowWrap: "break-word", lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {title}
         </h1>
-        {description && (
-          <p style={{ fontSize: 13, color: "#888", lineHeight: 1.6, marginTop: 6, wordBreak: "keep-all", overflowWrap: "break-word", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-            {description}
-          </p>
-        )}
+        {description && <ExpandableDescription text={description} />}
       </div>
 
       {/* ═══ CLOSED BANNER ═══ */}

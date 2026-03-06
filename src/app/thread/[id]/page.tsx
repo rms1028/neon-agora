@@ -16,6 +16,7 @@ import { AutoSummaryCard, type AutoSummary } from "@/components/auto-summary-car
 import { DebateReplay } from "@/components/debate-replay"
 import { AIDebatePanel } from "@/components/ai-debate-panel"
 import { XpGate } from "@/components/xp-gate"
+import { ExpandableDescription } from "@/components/expandable-description"
 
 export const revalidate = 15
 
@@ -314,11 +315,7 @@ export default async function ThreadDetailPage({
         <h1 style={{ fontSize: 18, fontWeight: 800, color: "#eee", wordBreak: "keep-all", overflowWrap: "break-word", lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {title}
         </h1>
-        {content && (
-          <p style={{ fontSize: 13, color: "#888", lineHeight: 1.6, marginTop: 6, wordBreak: "keep-all", overflowWrap: "break-word", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-            {content}
-          </p>
-        )}
+        {content && <ExpandableDescription text={content} />}
       </div>
 
       {/* ═══ Card Grid ═══ */}
