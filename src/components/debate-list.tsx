@@ -1170,8 +1170,8 @@ export function DebateList({ initialDebates, initialTag }: { initialDebates: Deb
     <section className="space-y-4">
       {/* 헤더: 검색 + 정렬 */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex shrink-0 items-center gap-2.5">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2.5">
             <h2 className="whitespace-nowrap text-sm font-semibold tracking-wide text-zinc-200">
               라이브 토론
             </h2>
@@ -1180,50 +1180,50 @@ export function DebateList({ initialDebates, initialTag }: { initialDebates: Deb
             </span>
           </div>
 
-          <div className="flex items-center gap-1 overflow-x-auto rounded-xl border border-white/10 bg-black/40 p-1 backdrop-blur scrollbar-hide">
+          <div className="grid grid-cols-4 gap-1 rounded-xl border border-white/10 bg-black/40 p-1 backdrop-blur">
             <button
               onClick={() => setSortBy("hot")}
-              className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all duration-200 sm:gap-1.5 sm:px-3 sm:text-xs ${
                 sortBy === "hot"
                   ? "bg-orange-500/20 text-orange-200 shadow-[0_0_14px_rgba(249,115,22,0.25)] ring-1 ring-orange-400/40"
                   : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
               }`}
             >
-              <Flame className="size-3.5" />
+              <Flame className="size-3" />
               HOT
             </button>
             <button
               onClick={() => setSortBy("latest")}
-              className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all duration-200 sm:gap-1.5 sm:px-3 sm:text-xs ${
                 sortBy === "latest"
                   ? "bg-cyan-500/20 text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.20)] ring-1 ring-cyan-400/40"
                   : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
               }`}
             >
-              <Clock className="size-3.5" />
-              최신순
+              <Clock className="size-3" />
+              최신
             </button>
             <button
               onClick={() => setSortBy("popular")}
-              className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all duration-200 sm:gap-1.5 sm:px-3 sm:text-xs ${
                 sortBy === "popular"
                   ? "bg-fuchsia-500/20 text-fuchsia-200 shadow-[0_0_14px_rgba(236,72,153,0.20)] ring-1 ring-fuchsia-400/40"
                   : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
               }`}
             >
-              <TrendingUp className="size-3.5" />
-              인기순
+              <TrendingUp className="size-3" />
+              인기
             </button>
             <button
               onClick={() => setSortBy("ending")}
-              className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all duration-200 sm:gap-1.5 sm:px-3 sm:text-xs ${
                 sortBy === "ending"
                   ? "bg-amber-500/20 text-amber-200 shadow-[0_0_14px_rgba(245,158,11,0.20)] ring-1 ring-amber-400/40"
                   : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
               }`}
             >
-              <Hourglass className="size-3.5" />
-              종료 임박
+              <Hourglass className="size-3" />
+              마감
             </button>
           </div>
         </div>
@@ -1242,8 +1242,8 @@ export function DebateList({ initialDebates, initialTag }: { initialDebates: Deb
               <ScanSearch className="size-4 shrink-0 text-zinc-400" />
             )}
             <input
-              className="w-full bg-transparent text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none"
-              placeholder={searchLoading ? "서버에서 검색 중…" : "토론 검색: 제목, 내용, 태그…"}
+              className="w-full min-w-0 bg-transparent text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none"
+              placeholder={searchLoading ? "검색 중…" : "토론 검색…"}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               aria-label="토론 검색"

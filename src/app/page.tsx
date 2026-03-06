@@ -217,14 +217,14 @@ function NeonStat({
   value: string
 }) {
   return (
-    <Card className="border-white/10 bg-black/30 py-4 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_0_40px_rgba(34,211,238,0.08)]">
-      <CardContent className="px-4">
-        <div className="flex items-center gap-3">
-          <div className="grid size-9 place-items-center rounded-lg border border-white/10 bg-white/5 text-cyan-300">
+    <Card className="border-white/10 bg-black/30 py-3 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_0_40px_rgba(34,211,238,0.08)] sm:py-4">
+      <CardContent className="px-3 sm:px-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden size-9 place-items-center rounded-lg border border-white/10 bg-white/5 text-cyan-300 sm:grid">
             {icon}
           </div>
-          <div className="min-w-0">
-            <div className="text-xs text-zinc-400">{label}</div>
+          <div className="flex min-w-0 items-center gap-1.5 sm:block">
+            <div className="whitespace-nowrap text-[10px] text-zinc-400 sm:text-xs">{label}</div>
             <div className="truncate text-sm font-semibold text-zinc-100">
               {value}
             </div>
