@@ -63,7 +63,12 @@ export function AuthModal({
     setOauthLoading(provider)
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: window.location.origin },
+      options: {
+        redirectTo: window.location.origin,
+        ...(provider === "kakao" && {
+          scopes: "profile_nickname profile_image",
+        }),
+      },
     })
     if (error) {
       setError(error.message)
