@@ -290,26 +290,30 @@ export default async function ThreadDetailPage({
      ═══════════════════════════════════════════ */
   return (
     <div className="flex h-full flex-col overflow-hidden text-zinc-100" style={{ background: "#0a0f14" }}>
-      {/* ═══ Header ═══ */}
-      <div className="shrink-0 border-b border-white/[0.04] px-3 pb-2 pt-3 md:px-6" style={{ background: "#0a0f14", position: "relative", zIndex: 10 }}>
-        {/* 1줄: ← + 제목 + 액션 */}
+      {/* ═══ Header bar ═══ */}
+      <div className="shrink-0 border-b border-white/[0.04] px-3 py-2 md:px-6" style={{ background: "#0a0f14", position: "relative", zIndex: 10 }}>
         <div className="flex items-center gap-2">
           <Link href="/" className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.03] text-zinc-500 transition hover:bg-white/[0.06] hover:text-zinc-200">
             <ArrowLeft className="size-4" />
           </Link>
-          <h1 className="min-w-0 flex-1 truncate text-[16px] font-bold leading-snug text-zinc-100 md:text-xl md:font-black">{title}</h1>
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            {tag && <span className="whitespace-nowrap text-[10px] font-bold tracking-wider text-zinc-600">#{tag}</span>}
+            {threadUpdatedAt && <span className="whitespace-nowrap text-[9px] text-zinc-700">(수정됨)</span>}
+            <CountdownWrapper expiresAt={expiresAt} isClosed={isClosed} threadId={id} />
+          </div>
           <div className="flex shrink-0 items-center gap-1">
             <ShareButton title={title} threadId={id} />
             <ThreadEditButton threadId={id} threadCreatedBy={createdBy} initialTitle={title} initialContent={content} initialTag={tag} isClosed={isClosed} />
             <MuteButton threadId={id} />
           </div>
         </div>
-        {/* 2줄: 태그 + 카운트다운 */}
-        <div className="mt-1.5 flex items-center gap-2 pl-12">
-          {tag && <span className="text-[10px] font-bold tracking-wider text-zinc-600">#{tag}</span>}
-          {threadUpdatedAt && <span className="text-[9px] text-zinc-700">(수정됨)</span>}
-          <CountdownWrapper expiresAt={expiresAt} isClosed={isClosed} threadId={id} />
-        </div>
+      </div>
+
+      {/* ═══ Title area ═══ */}
+      <div className="shrink-0" style={{ background: "#0a0f14", position: "relative", zIndex: 10, padding: "12px 16px" }}>
+        <h1 style={{ fontSize: 18, fontWeight: 800, color: "#eee", wordBreak: "keep-all", overflowWrap: "break-word", lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+          {title}
+        </h1>
       </div>
 
       {/* ═══ Card Grid ═══ */}

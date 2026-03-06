@@ -370,42 +370,36 @@ export function ProConBattle({
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#0a0a0f", color: "#eee" }}>
       {/* ═══ HEADER ═══ */}
-      <header className="px-3 py-2.5 md:px-5 md:py-3" style={{
+      <header className="px-3 py-2 md:px-5 md:py-3" style={{
         background: "#0a0a0f",
         borderBottom: "1px solid rgba(255,255,255,0.04)",
         flexShrink: 0,
       }}>
-        {/* 1줄: ← + 제목 + 액션 */}
+        {/* 1줄: ← + 메타 + 액션 */}
         <div className="flex items-center gap-2">
           <Link href="/" className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/[0.06] bg-white/[0.03] text-zinc-500 transition hover:bg-white/[0.06] hover:text-zinc-200" style={{ fontSize: 18 }}>
             {"\u2190"}
           </Link>
-          <h1 className="min-w-0 flex-1 truncate text-[16px] font-bold text-zinc-100 md:text-lg md:font-extrabold" style={{ letterSpacing: -0.3 }}>
-            {title}
-          </h1>
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            {countdown}
+            <span className="whitespace-nowrap text-[11px] text-zinc-600">
+              {participantCount}명 참여
+            </span>
+          </div>
           <div className="flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setToolsOpen(true)}
+              className="inline-flex size-9 items-center justify-center rounded-lg border border-emerald-400/25 bg-emerald-400/8 text-emerald-300 transition hover:bg-emerald-400/15 md:h-8 md:w-auto md:gap-1.5 md:px-3"
+            >
+              <Settings2 className="size-3.5" />
+              <span className="hidden md:inline text-[12px] font-medium">도구</span>
+            </button>
             {headerActions}
           </div>
         </div>
 
-        {/* 2줄: 카운트다운 + 참여 + 도구 */}
-        <div className="mt-1.5 flex items-center gap-2 pl-12">
-          {countdown}
-          <span className="whitespace-nowrap text-[11px] text-zinc-600">
-            {participantCount}명 참여
-          </span>
-          <div className="flex-1" />
-          <button
-            type="button"
-            onClick={() => setToolsOpen(true)}
-            className="inline-flex size-9 items-center justify-center rounded-lg border border-emerald-400/25 bg-emerald-400/8 text-emerald-300 transition hover:bg-emerald-400/15 md:h-8 md:w-auto md:gap-1.5 md:px-3"
-          >
-            <Settings2 className="size-3.5" />
-            <span className="hidden md:inline text-[12px] font-medium">도구</span>
-          </button>
-        </div>
-
-        {/* 3줄: 찬반 비율 바 */}
+        {/* 2줄: 찬반 비율 바 */}
         <div className="mt-2 flex items-center gap-2">
           <span style={{ fontSize: 11, fontWeight: 800, color: PRO, fontFamily: "var(--font-orbitron), monospace", minWidth: 32 }}>{proPercent}%</span>
           <div style={{ flex: 1, display: "flex", height: 3, borderRadius: 2, gap: 2 }}>
@@ -415,6 +409,13 @@ export function ProConBattle({
           <span style={{ fontSize: 11, fontWeight: 800, color: CON, fontFamily: "var(--font-orbitron), monospace", minWidth: 32, textAlign: "right" }}>{conPercent}%</span>
         </div>
       </header>
+
+      {/* ═══ TITLE AREA ═══ */}
+      <div style={{ background: "#0a0a0f", position: "relative", zIndex: 10, padding: "12px 16px", flexShrink: 0 }}>
+        <h1 style={{ fontSize: 18, fontWeight: 800, color: "#eee", wordBreak: "keep-all", overflowWrap: "break-word", lineHeight: 1.4, margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+          {title}
+        </h1>
+      </div>
 
       {/* ═══ CLOSED BANNER ═══ */}
       {isClosed && (
