@@ -7,10 +7,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Flame,
+  MessageSquareText,
   Sparkles,
   Swords,
   ThumbsDown,
   ThumbsUp,
+  Users,
   Zap,
 } from "lucide-react"
 
@@ -76,6 +78,7 @@ export function HotDebatesCarousel({
   if (count === 0) return null
 
   const debate = hotDebates[activeIndex]
+  const isFree = !debate.template || debate.template === "free"
   const total = debate.proCount + debate.conCount
   const proPct = total > 0 ? Math.round((debate.proCount / total) * 100) : 50
   const conPct = 100 - proPct
@@ -147,50 +150,75 @@ export function HotDebatesCarousel({
               <h2 className="line-clamp-2 text-base font-extrabold leading-tight text-white sm:text-2xl lg:text-3xl">
                 {debate.title}
               </h2>
-              {/* 굵은 게이지 */}
-              <div className="relative h-3 w-full max-w-md overflow-hidden rounded-full bg-white/[0.08]">
-                <div
-                  className="absolute inset-y-0 left-0 rounded-l-full bg-gradient-to-r from-cyan-400 to-sky-400 shadow-[0_0_10px_rgba(34,211,238,0.3)]"
-                  style={{ width: `${proPct}%` }}
-                />
-                <div
-                  className="absolute inset-y-0 right-0 rounded-r-full bg-gradient-to-l from-fuchsia-400 to-pink-400 shadow-[0_0_10px_rgba(236,72,153,0.3)]"
-                  style={{ width: `${conPct}%` }}
-                />
-              </div>
+              {isFree ? (
+                /* 자유토론: 참여 현황 바 */
+                <div className="flex items-center gap-3 text-[12px] text-zinc-400">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[#39FF14]/20 bg-[#39FF14]/10 px-2.5 py-1 text-[11px] font-medium text-[#39FF14]/80">
+                    FREE
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <Users className="size-3" />
+                    {total > 0 ? `${total.toLocaleString()}명 참여` : "참여자 대기 중"}
+                  </span>
+                  {(debate.commentCount ?? 0) > 0 && (
+                    <span className="inline-flex items-center gap-1">
+                      <MessageSquareText className="size-3" />
+                      댓글 {debate.commentCount}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                /* 찬반토론: 게이지 바 */
+                <div className="relative h-3 w-full max-w-md overflow-hidden rounded-full bg-white/[0.08]">
+                  <div
+                    className="absolute inset-y-0 left-0 rounded-l-full bg-gradient-to-r from-cyan-400 to-sky-400 shadow-[0_0_10px_rgba(34,211,238,0.3)]"
+                    style={{ width: `${proPct}%` }}
+                  />
+                  <div
+                    className="absolute inset-y-0 right-0 rounded-r-full bg-gradient-to-l from-fuchsia-400 to-pink-400 shadow-[0_0_10px_rgba(236,72,153,0.3)]"
+                    style={{ width: `${conPct}%` }}
+                  />
+                </div>
+              )}
             </div>
 
             {/* 우: 퍼센트 + CTA */}
             <div className="flex shrink-0 items-center gap-6">
-              <div className="hidden items-center gap-5 sm:flex">
-                <div className="text-center">
-                  <div className="text-[10px] text-zinc-500">찬성</div>
-                  <div className="text-3xl font-extrabold tabular-nums leading-none text-cyan-300">
-                    {proPct}<span className="text-sm font-bold">%</span>
+              {!isFree && (
+                <div className="hidden items-center gap-5 sm:flex">
+                  <div className="text-center">
+                    <div className="text-[10px] text-zinc-500">찬성</div>
+                    <div className="text-3xl font-extrabold tabular-nums leading-none text-cyan-300">
+                      {proPct}<span className="text-sm font-bold">%</span>
+                    </div>
+                    <div className="mt-1 flex items-center justify-center gap-0.5 text-[11px] text-zinc-500">
+                      <ThumbsUp className="size-3" />
+                      {debate.proCount.toLocaleString()}
+                    </div>
                   </div>
-                  <div className="mt-1 flex items-center justify-center gap-0.5 text-[11px] text-zinc-500">
-                    <ThumbsUp className="size-3" />
-                    {debate.proCount.toLocaleString()}
+                  <div className="h-12 w-px bg-white/10" />
+                  <div className="text-center">
+                    <div className="text-[10px] text-zinc-500">반대</div>
+                    <div className="text-3xl font-extrabold tabular-nums leading-none text-fuchsia-300">
+                      {conPct}<span className="text-sm font-bold">%</span>
+                    </div>
+                    <div className="mt-1 flex items-center justify-center gap-0.5 text-[11px] text-zinc-500">
+                      <ThumbsDown className="size-3" />
+                      {debate.conCount.toLocaleString()}
+                    </div>
                   </div>
                 </div>
-                <div className="h-12 w-px bg-white/10" />
-                <div className="text-center">
-                  <div className="text-[10px] text-zinc-500">반대</div>
-                  <div className="text-3xl font-extrabold tabular-nums leading-none text-fuchsia-300">
-                    {conPct}<span className="text-sm font-bold">%</span>
-                  </div>
-                  <div className="mt-1 flex items-center justify-center gap-0.5 text-[11px] text-zinc-500">
-                    <ThumbsDown className="size-3" />
-                    {debate.conCount.toLocaleString()}
-                  </div>
-                </div>
-              </div>
+              )}
               <Link
                 href={`/thread/${debate.id}`}
-                className="inline-flex items-center gap-2 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-semibold text-cyan-100 transition hover:bg-cyan-400/20 hover:shadow-[0_0_16px_rgba(34,211,238,0.2)]"
+                className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-xs font-semibold transition ${
+                  isFree
+                    ? "border-[#39FF14]/30 bg-[#39FF14]/10 text-[#39FF14] hover:bg-[#39FF14]/20 hover:shadow-[0_0_16px_rgba(57,255,20,0.2)]"
+                    : "border-cyan-400/30 bg-cyan-400/10 text-cyan-100 hover:bg-cyan-400/20 hover:shadow-[0_0_16px_rgba(34,211,238,0.2)]"
+                }`}
               >
                 <Sparkles className="size-3.5" />
-                토론 참여
+                {isFree ? "의견 남기기" : "토론 참여"}
               </Link>
             </div>
           </motion.div>
